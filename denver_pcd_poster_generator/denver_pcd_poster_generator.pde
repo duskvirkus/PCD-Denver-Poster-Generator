@@ -1,14 +1,13 @@
 // press s to save 1 poster
 // press d to save 10 posters (won't render between them and may take a second)
 
-float exportWidth = 11; // inches
-float exportHeight = 17; // inches
+float exportWidth = 8.5; // inches
+float exportHeight = 11; // inches
 int exportDPI = 300; // dots per inch
 PGraphics poster;
 
 color bgColor;
-color primaryColor;
-color secondaryColor;
+
 
 PImage pcdText;
 PImage pcdInfo;
@@ -55,6 +54,7 @@ void loadImages() {
 void setColors() {
   bgColor = color(48, 73, 89);
   primaryColor = color(80, 128, 132);
+  secondaryColor = color(184, 219, 202);
 }
 
 void generatePoster() {
@@ -63,6 +63,7 @@ void generatePoster() {
   poster.beginDraw();
   poster.background(bgColor);
   poster.fill(primaryColor);
+  poster.stroke(secondaryColor);
   randomCircles(300);
   addImagesToPoster();
   poster.endDraw();
@@ -81,7 +82,6 @@ void randomCircles(int numberOfCircles) {
       continue;
     }
     float speed = abs(x - previousX) + abs(y - previousY);
-    poster.stroke(secondaryColor);
     poster.strokeWeight(speed / 100);
     poster.ellipse(x, y, speed, speed);
     previousX = x;
