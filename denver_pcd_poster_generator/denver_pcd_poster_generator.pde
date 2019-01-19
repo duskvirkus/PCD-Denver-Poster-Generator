@@ -7,8 +7,7 @@ int exportDPI = 300; // dots per inch
 PGraphics poster;
 
 color bgColor;
-color primaryColor;
-color secondaryColor;
+ArrayList<Color> colors = new ArrayList<Color>();
 
 PImage pcdText;
 PImage pcdInfo;
@@ -54,7 +53,12 @@ void loadImages() {
 
 void setColors() {
   bgColor = color(48, 73, 89);
-  primaryColor = color(80, 128, 132);
+  colors.add(new Color(color(232, 146, 146)));
+  colors.add(new Color(color(255, 110, 74)));
+  colors.add(new Color(color(242, 187, 75)));
+  colors.add(new Color(color(96, 168, 60)));
+  colors.add(new Color(color(103, 178, 199)));
+  colors.add(new Color(color(192, 68, 150)));
 }
 
 void generatePoster() {
@@ -62,8 +66,8 @@ void generatePoster() {
   noiseSeed((long)random(Integer.MAX_VALUE));
   poster.beginDraw();
   poster.background(bgColor);
-  poster.fill(primaryColor);
-  randomCircles(300);
+  poster.noStroke();
+  randomCircles(250);
   addImagesToPoster();
   poster.endDraw();
   posterGenerated = true;
@@ -73,6 +77,7 @@ void randomCircles(int numberOfCircles) {
   float previousX = 0;
   float previousY = 0;
   for (int i = 0; i <= numberOfCircles; i++) {
+    poster.fill(colors.get(int(random(colors.size()))).c);
     float x = map(noise(i * 0.05, 0), .25, .75, 0, poster.width);
     float y = map(noise(i * 0.05, 100), .25, .75, 0, poster.height);
     if (i == 0) {
@@ -81,8 +86,6 @@ void randomCircles(int numberOfCircles) {
       continue;
     }
     float speed = abs(x - previousX) + abs(y - previousY);
-    poster.stroke(secondaryColor);
-    poster.strokeWeight(speed / 100);
     poster.ellipse(x, y, speed, speed);
     previousX = x;
     previousY = y;
