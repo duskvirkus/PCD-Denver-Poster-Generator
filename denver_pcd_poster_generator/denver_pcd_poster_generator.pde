@@ -1,9 +1,21 @@
 // press s to save 1 poster
 // press d to save 10 posters (won't render between them and may take a second)
 
-float exportWidth = 11; // inches
-float exportHeight = 17; // inches
-int exportDPI = 300; // dots per inch
+// Mode
+int PIXELS = 0;
+int INCHES = 1;
+int runningMode = PIXELS;
+
+// Variables for Size in Pixels
+int widthPixels = 500;
+int heightPixels = 500;
+
+// Variables for Size in Inches
+float widthInches = 11;
+float heightInches = 17;
+int dotsPerInch = 300;
+
+
 PGraphics poster;
 
 color bgColor;
@@ -41,9 +53,18 @@ void keyPressed() {
 }
 
 void savePoster() {
-  poster.save("export/PCD-Denver-Poster-" + exportWidth + "-" + exportHeight + "-" + saveCounter + ".png");
+  poster.save("export/PCD-Denver-Poster-" + getPosterDimensions() + "-" + saveCounter + ".png");
   saveCounter++;
   generatePoster();
+}
+
+String getPosterDimensions() {
+  if (runningMode == INCHES) {
+    return widthInches + "by" + heightInches + "inches";
+  } else if (runningMode == PIXELS) {
+    return widthPixels + "by" + heightPixels + "px";
+  }
+  return "DimensionsUnknown";
 }
 
 void loadImages() {
@@ -62,7 +83,13 @@ void setColors() {
 }
 
 void generatePoster() {
-  poster = createGraphics(int(exportWidth * exportDPI), int(exportHeight * exportDPI));
+  if (runningMode == PIXELS) {
+    poster = createGraphics(widthPixels, heightPixels);
+  } else if (runningMode == INCHES) {
+    poster = createGraphics(int(widthInches * dotsPerInch), int(heightInches * dotsPerInch));
+  } else {
+    println("Error runningMode " + runningMode + " not supported!");
+  }
   noiseSeed((long)random(Integer.MAX_VALUE));
   poster.beginDraw();
   poster.background(bgColor);
@@ -93,7 +120,7 @@ void randomCircles(int numberOfCircles) {
 }
 
 void addImagesToPoster() {
-  int offset = 100;
+  int offset = poster.width/12;
   float pcdTextWidth = 2*poster.width/3;
   float pcdTextHeight = calculateHeight(pcdText, pcdTextWidth);
   poster.image(pcdText, offset, offset, pcdTextWidth, pcdTextHeight);
