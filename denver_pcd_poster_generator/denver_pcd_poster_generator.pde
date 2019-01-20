@@ -4,11 +4,11 @@
 // Mode
 int PIXELS = 0;
 int INCHES = 1;
-int runningMode = INCHES;
+int runningMode = PIXELS;
 
 // Variables for Size in Pixels
-int widthPixels = 1920;
-int heightPixels = 1080;
+int widthPixels = 1000;
+int heightPixels = 1000;
 
 // Variables for Size in Inches
 float widthInches = 11;
@@ -26,10 +26,15 @@ ArrayList<Color> colors = new ArrayList<Color>();
 int saveCounter = 0;
 boolean posterGenerated = false;
 
-ArrayList<PFont> swagger = new ArrayList<PFont>();
+ArrayList<PFont> type = new ArrayList<PFont>();
+
+// Speakers
+PImage ari;
+PImage joshua;
 
 void setup() {
   size(500, 600);
+  loadImages();
   setColors();
   generatePoster();
 }
@@ -67,8 +72,14 @@ String getPosterDimensions() {
   return "DimensionsUnknown";
 }
 
-void swaggerFont(int size) {
-  for (PFont f : swagger) {
+void loadImages() {
+  ari = loadImage("AriMelenciano.jpg");
+  joshua = loadImage("JoshuaDavis.jpg");
+}
+
+void setTypeSize(int size) {
+  println(size);
+  for (PFont f : type) {
     if (f.getSize() == size) {
       poster.textFont(f);
       return;
@@ -76,7 +87,7 @@ void swaggerFont(int size) {
   }
   PFont temp = createFont("Swagger.ttf", size);
   poster.textFont(temp);
-  swagger.add(temp);
+  type.add(temp);
 }
 
 void setColors() {
@@ -100,45 +111,87 @@ void generatePoster() {
   poster.beginDraw();
   poster.background(bgColor);
   poster.noStroke();
-  randomCircles(250);
+  posterCircles();
   posterText();
   poster.endDraw();
   posterGenerated = true;
 }
 
-void randomCircles(int numberOfCircles) {
+void posterCircles() {
+  PVector ariLocation = new PVector(random(poster.width/6, poster.width/2), 7*poster.height/16);
+  PVector joshuaLocation = new PVector(random(poster.width/6, poster.width/2), 9*poster.height/16);
+  float noiseXPosition = 0;
+  noiseXPosition = randomCircles(
+    220,
+    new PVector(random(poster.width), random(poster.height)),
+    ariLocation,
+    noiseXPosition,
+    poster.width/2
+  );
+  ellipseImage(poster, ari, ariLocation);
+  noiseXPosition = randomCircles(
+    10,
+    ariLocation,
+    joshuaLocation,
+    noiseXPosition,
+    poster.width/4
+  );
+  ellipseImage(poster, joshua, joshuaLocation);
+  noiseXPosition = randomCircles(
+    10,
+    joshuaLocation,
+    new PVector(random(poster.width), random(poster.height)),
+    noiseXPosition,
+    poster.width/8
+  );
+  speakerType("Ari Melenciano", ariLocation);
+  speakerType("Joshua Davis", joshuaLocation);
+}
+
+float randomCircles(int numberOfCircles, PVector start, PVector end, float noiseStart, float maxSize) {
+  float noiseScale = 0.045;
+  int threshold = numberOfCircles/5;
   float previousX = 0;
   float previousY = 0;
   for (int i = 0; i <= numberOfCircles; i++) {
     poster.fill(colors.get(int(random(colors.size()))).c);
-    float x = map(noise(i * 0.045, 0), .25, .75, 0, poster.width);
-    float y = map(noise(i * 0.045, 100), .25, .75, 0, poster.height);
-    if (i == 0) {
+    float x = map(noise(i * noiseScale + noiseStart, 0), .25, .75, 0, poster.width);
+    float y = map(noise(i * noiseScale + noiseStart, 100), .25, .75, 0, poster.height);
+    if (i < threshold) {
+      x = lerp(start.x, x, i/float(threshold));
+      y = lerp(start.y, y, i/float(threshold));
+    } else if (i > numberOfCircles - threshold) {
+      x = lerp(x, end.x, (i - (numberOfCircles - threshold)) / float(threshold));
+      y = lerp(y, end.y, (i - (numberOfCircles - threshold)) / float(threshold));
+    }
+    if (i <= 1) {
       previousX = x;
       previousY = y;
       continue;
     }
     float speed = abs(x - previousX) + abs(y - previousY);
+    if (speed > maxSize) speed = maxSize;
     poster.ellipse(x, y, speed, speed);
     previousX = x;
     previousY = y;
   }
+  return numberOfCircles * noiseScale + noiseStart;
 }
 
 void posterText() {
   int boarder = poster.width/12;
   int x, y;
-  
+
   poster.fill(textColor);
   int typeSize;
   if (poster.height > poster.width) {
     typeSize = poster.width/typeScale;
   } else {
-    typeSize = poster.width/(typeScale * 2);
+    typeSize = poster.height/typeScale;
   }
-  
+
   // Title Section
-  swaggerFont(typeSize);
+  setTypeSize(typeSize);
   x = boarder;
   y = boarder;
   poster.textAlign(LEFT, TOP);
@@ -147,20 +200,20 @@ void posterText() {
   poster.text("in Denver", x, y);
   y += typeSize * 1.2;
   typeSize = typeSize / 16 * 13;
-  swaggerFont(typeSize);
+  setTypeSize(typeSize);
   poster.text("at The Commons on Champa", x, y);
   y += typeSize * 1.2;
   poster.text("Febuary 9, 2019", x, y);
-  
+
   // Bottom - reverse order
   typeSize = typeSize / 16 * 13;
-  swaggerFont(typeSize);
+  setTypeSize(typeSize);
   y = poster.height - boarder;
   poster.textAlign(LEFT, BOTTOM);
   poster.text("More Information at ProcessingDayDenver.org", x, y);
   y -= typeSize * 1.8;
   typeSize = typeSize / 16 * 13;
-  swaggerFont(typeSize);
+  setTypeSize(typeSize);
   poster.text("for learning how to code within the context of the visual arts.", x, y);
   y -= typeSize * 1.2;
   poster.text("Processing is a flexible software sketchbook and a language", x, y);
@@ -169,7 +222,22 @@ void posterText() {
   y -= typeSize * 1.2;
   poster.text("An inclusive event that will bring together people of all ages", x, y);
   y -= typeSize * 1.2;
-  
+}
+
+void speakerType(String type, PVector location) {
+  int x = int(location.x + (shortSide(poster) / 8) * 1.2);
+  int y = int(location.y - (shortSide(poster) / 8) * 0.9);
+  poster.fill(textColor);
+  int typeSize;
+  if (poster.height > poster.width) {
+    typeSize = poster.width/typeScale;
+  } else {
+    typeSize = poster.height/typeScale;
+  }
+  typeSize = typeSize / 16 * 13;
+  setTypeSize(typeSize);
+  poster.textAlign(LEFT, TOP);
+  poster.text(type, x, y);
 }
 
 float calculateHeight(PImage img, float currentWidth) {
@@ -183,4 +251,32 @@ void showPoster() {
     scale++;
   }
   image(poster, 0, 0, poster.width/scale, poster.height/scale);
+}
+
+int shortSide(PGraphics pg) {
+  if (pg.width < pg.height) {
+    return pg.width;
+  }
+  return pg.height;
+}
+
+void ellipseImage(PGraphics pg, PImage img, PVector location) {
+  PImage temp = img.get();
+  temp.resize(shortSide(pg)/6, shortSide(pg)/6);
+  temp.mask(circleMask(temp.width, temp.height));
+  pg.imageMode(CENTER);
+  pg.tint(colors.get(int(random(colors.size()))).c);
+  pg.image(temp, location.x, location.y);
+  pg.noTint();
+}
+
+PGraphics circleMask(int w, int h) {
+  PGraphics pg = createGraphics(w, h);
+  pg.beginDraw();
+  pg.background(0);
+  pg.noStroke();
+  pg.fill(255, 255);
+  pg.ellipse(pg.width/2, pg.height/2, pg.width, pg.height);
+  pg.endDraw();
+  return pg;
 }
