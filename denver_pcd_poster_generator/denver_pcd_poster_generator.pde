@@ -4,7 +4,7 @@
 // Mode
 int PIXELS = 0;
 int INCHES = 1;
-int runningMode = PIXELS;
+int runningMode = INCHES;
 
 // Variables for Size in Pixels
 int widthPixels = 1000;
@@ -15,8 +15,6 @@ float widthInches = 11;
 float heightInches = 17;
 int dotsPerInch = 300;
 
-int typeScale = 15;
-
 PGraphics poster;
 
 color bgColor;
@@ -26,7 +24,9 @@ ArrayList<Color> colors = new ArrayList<Color>();
 int saveCounter = 0;
 boolean posterGenerated = false;
 
-ArrayList<PFont> type = new ArrayList<PFont>();
+String typePathHeavy = "Mont-HeavyDEMO.otf";
+String typePathLight = "Mont-ExtraLightDEMO.otf";
+int typeScale = 18;
 
 // Speakers
 PImage ari;
@@ -77,17 +77,9 @@ void loadImages() {
   joshua = loadImage("JoshuaDavis.jpg");
 }
 
-void setTypeSize(int size) {
-  println(size);
-  for (PFont f : type) {
-    if (f.getSize() == size) {
-      poster.textFont(f);
-      return;
-    }
-  }
-  PFont temp = createFont("Swagger.ttf", size);
+void setType(int size, String typePath) {
+  PFont temp = createFont(typePath, size);
   poster.textFont(temp);
-  type.add(temp);
 }
 
 void setColors() {
@@ -191,7 +183,7 @@ void posterText() {
   }
 
   // Title Section
-  setTypeSize(typeSize);
+  setType(typeSize, typePathHeavy);
   x = boarder;
   y = boarder;
   poster.textAlign(LEFT, TOP);
@@ -200,20 +192,20 @@ void posterText() {
   poster.text("in Denver", x, y);
   y += typeSize * 1.2;
   typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  setType(typeSize, typePathLight);
   poster.text("at The Commons on Champa", x, y);
   y += typeSize * 1.2;
   poster.text("Febuary 9, 2019", x, y);
 
   // Bottom - reverse order
   typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  setType(typeSize, typePathHeavy);
   y = poster.height - boarder;
   poster.textAlign(LEFT, BOTTOM);
   poster.text("More Information at ProcessingDayDenver.org", x, y);
   y -= typeSize * 1.8;
   typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  setType(typeSize, typePathLight);
   poster.text("for learning how to code within the context of the visual arts.", x, y);
   y -= typeSize * 1.2;
   poster.text("Processing is a flexible software sketchbook and a language", x, y);
@@ -235,7 +227,7 @@ void speakerType(String type, PVector location) {
     typeSize = poster.height/typeScale;
   }
   typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  setType(typeSize, typePathHeavy);
   poster.textAlign(LEFT, TOP);
   poster.text(type, x, y);
 }
