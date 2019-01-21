@@ -11,11 +11,9 @@ int widthPixels = 1000;
 int heightPixels = 1000;
 
 // Variables for Size in Inches
-float widthInches = 11;
-float heightInches = 17;
+float widthInches = 8.5;
+float heightInches = 11;
 int dotsPerInch = 300;
-
-int typeScale = 15;
 
 PGraphics poster;
 
@@ -26,7 +24,9 @@ ArrayList<Color> colors = new ArrayList<Color>();
 int saveCounter = 0;
 boolean posterGenerated = false;
 
-ArrayList<PFont> type = new ArrayList<PFont>();
+String typePathHeavy = "Mont-HeavyDEMO.otf";
+String typePathLight = "Mont-ExtraLightDEMO.otf";
+int typeScale = 18;
 
 // Speakers
 PImage ari;
@@ -35,7 +35,7 @@ PImage joshua;
 void setup() {
   size(500, 600);
   loadImages();
-  setColors();
+  //setColors();
   generatePoster();
 }
 
@@ -77,29 +77,25 @@ void loadImages() {
   joshua = loadImage("JoshuaDavis.jpg");
 }
 
-void setTypeSize(int size) {
-  println(size);
-  for (PFont f : type) {
-    if (f.getSize() == size) {
-      poster.textFont(f);
-      return;
-    }
-  }
-  PFont temp = createFont("Swagger.ttf", size);
+void setType(int size, String typePath) {
+  PFont temp = createFont(typePath, size);
   poster.textFont(temp);
-  type.add(temp);
 }
 
-void setColors() {
-  bgColor = color(180, 200, 230);
+void setColors(int numberOfColors) {
+  colorMode(RGB, 255);
+  bgColor = color(255);
   textColor = color(0);
-  colors.add(new Color(color(255, 85, 85))); // redish pink
-  colors.add(new Color(color(245, 225, 65))); // yellow
-  colors.add(new Color(color(90, 130, 240))); // blue
-  colors.add(new Color(color(195, 75, 160))); // purple
+  colorMode(HSB, 100);
+  float hue = random(100);
+  for (int i = 0; i < numberOfColors; i++) {
+    colors.add(new Color(color(hue, 75, 90)));
+    hue = (hue + random(30, 60)) % 100;
+  }
 }
 
 void generatePoster() {
+  setColors(int(random(2, 3)));
   if (runningMode == PIXELS) {
     poster = createGraphics(widthPixels, heightPixels);
   } else if (runningMode == INCHES) {
@@ -118,34 +114,39 @@ void generatePoster() {
 }
 
 void posterCircles() {
-  PVector ariLocation = new PVector(random(poster.width/6, poster.width/2), 7*poster.height/16);
-  PVector joshuaLocation = new PVector(random(poster.width/6, poster.width/2), 9*poster.height/16);
+  PVector ariLocation = new PVector(random(poster.width/6, poster.width/2), 3*poster.height/8);
+  PVector joshuaLocation = new PVector(random(poster.width/6, poster.width/2), 5*poster.height/8);
   float noiseXPosition = 0;
   noiseXPosition = randomCircles(
-    220,
+    250,
     new PVector(random(poster.width), random(poster.height)),
     ariLocation,
     noiseXPosition,
     poster.width/2
   );
-  ellipseImage(poster, ari, ariLocation);
-  noiseXPosition = randomCircles(
-    10,
-    ariLocation,
-    joshuaLocation,
-    noiseXPosition,
-    poster.width/4
-  );
-  ellipseImage(poster, joshua, joshuaLocation);
-  noiseXPosition = randomCircles(
-    10,
-    joshuaLocation,
-    new PVector(random(poster.width), random(poster.height)),
-    noiseXPosition,
-    poster.width/8
-  );
-  speakerType("Ari Melenciano", ariLocation);
-  speakerType("Joshua Davis", joshuaLocation);
+  if (poster.width < poster.height) {
+    ellipseImage(poster, ari, ariLocation);
+    noiseXPosition = randomCircles(
+      5,
+      ariLocation,
+      joshuaLocation,
+      noiseXPosition,
+      poster.width/4
+    );
+    ellipseImage(poster, joshua, joshuaLocation);
+    noiseXPosition = randomCircles(
+      5,
+      joshuaLocation,
+      new PVector(random(poster.width), random(poster.height)),
+      noiseXPosition,
+      poster.width/8
+    );
+    speakerType(ariLocation, (shortSide(poster) / 8), "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
+    speakerType(joshuaLocation, (shortSide(poster) / 8), "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
+  } else {
+    speakerType(new PVector(poster.width/6, poster.height/2), "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
+    speakerType(joshuaLocation, "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
+  }
 }
 
 float randomCircles(int numberOfCircles, PVector start, PVector end, float noiseStart, float maxSize) {
@@ -153,14 +154,18 @@ float randomCircles(int numberOfCircles, PVector start, PVector end, float noise
   int threshold = numberOfCircles/5;
   float previousX = 0;
   float previousY = 0;
-  for (int i = 0; i <= numberOfCircles; i++) {
-    poster.fill(colors.get(int(random(colors.size()))).c);
+  for (int i = 0; i <= numberOfCircles - 1; i++) {
+    color baseColor = colors.get(int(random(colors.size()))).c;
     float x = map(noise(i * noiseScale + noiseStart, 0), .25, .75, 0, poster.width);
     float y = map(noise(i * noiseScale + noiseStart, 100), .25, .75, 0, poster.height);
+    //float lerpFactor = abs(map(height - y/4, 0, height, 0, 1));
+    //println("y = " + y + " lerp = " + lerpFactor);
+    poster.fill(lerpColor(baseColor, bgColor, getLerpFactor(y, poster.height)));
+    //poster.stroke(0);
     if (i < threshold) {
       x = lerp(start.x, x, i/float(threshold));
       y = lerp(start.y, y, i/float(threshold));
-    } else if (i > numberOfCircles - threshold) {
+    } else if (i > numberOfCircles - (threshold + 1)) {
       x = lerp(x, end.x, (i - (numberOfCircles - threshold)) / float(threshold));
       y = lerp(y, end.y, (i - (numberOfCircles - threshold)) / float(threshold));
     }
@@ -178,6 +183,13 @@ float randomCircles(int numberOfCircles, PVector start, PVector end, float noise
   return numberOfCircles * noiseScale + noiseStart;
 }
 
+float getLerpFactor(float y, int h) {
+  if (y < h/2) {
+    return map(y, 0, h/2, 1, 0);
+  }
+  return map(y, h/2, h, 0, 1);
+}
+
 void posterText() {
   int boarder = poster.width/12;
   int x, y;
@@ -191,7 +203,7 @@ void posterText() {
   }
 
   // Title Section
-  setTypeSize(typeSize);
+  setType(typeSize, typePathHeavy);
   x = boarder;
   y = boarder;
   poster.textAlign(LEFT, TOP);
@@ -199,21 +211,19 @@ void posterText() {
   y += typeSize * 1.2;
   poster.text("in Denver", x, y);
   y += typeSize * 1.2;
-  typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  setType(typeSize, typePathLight);
   poster.text("at The Commons on Champa", x, y);
   y += typeSize * 1.2;
   poster.text("Febuary 9, 2019", x, y);
 
   // Bottom - reverse order
-  typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  typeSize = typeSize / 2;
+  setType(typeSize, typePathHeavy);
   y = poster.height - boarder;
   poster.textAlign(LEFT, BOTTOM);
   poster.text("More Information at ProcessingDayDenver.org", x, y);
   y -= typeSize * 1.8;
-  typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  setType(typeSize, typePathLight);
   poster.text("for learning how to code within the context of the visual arts.", x, y);
   y -= typeSize * 1.2;
   poster.text("Processing is a flexible software sketchbook and a language", x, y);
@@ -224,9 +234,9 @@ void posterText() {
   y -= typeSize * 1.2;
 }
 
-void speakerType(String type, PVector location) {
-  int x = int(location.x + (shortSide(poster) / 8) * 1.2);
-  int y = int(location.y - (shortSide(poster) / 8) * 0.9);
+void speakerType(PVector location, int offset, String type, String... description) {
+  int x = int(location.x + offset * 1.2);
+  int y = int(location.y - offset * 0.9);
   poster.fill(textColor);
   int typeSize;
   if (poster.height > poster.width) {
@@ -234,10 +244,17 @@ void speakerType(String type, PVector location) {
   } else {
     typeSize = poster.height/typeScale;
   }
-  typeSize = typeSize / 16 * 13;
-  setTypeSize(typeSize);
+  typeSize = typeSize / 4 * 3;
+  setType(typeSize, typePathHeavy);
   poster.textAlign(LEFT, TOP);
   poster.text(type, x, y);
+  y += typeSize * 1.2;
+  typeSize = typeSize / 2;
+  setType(typeSize, typePathHeavy);
+  for (int i = 0; i < description.length; i++) {
+    poster.text(description[i], x, y);
+    y += typeSize * 1.2;
+  }
 }
 
 float calculateHeight(PImage img, float currentWidth) {
@@ -262,7 +279,7 @@ int shortSide(PGraphics pg) {
 
 void ellipseImage(PGraphics pg, PImage img, PVector location) {
   PImage temp = img.get();
-  temp.resize(shortSide(pg)/6, shortSide(pg)/6);
+  temp.resize(shortSide(pg)/4, shortSide(pg)/4);
   temp.mask(circleMask(temp.width, temp.height));
   pg.imageMode(CENTER);
   pg.tint(colors.get(int(random(colors.size()))).c);
