@@ -144,8 +144,9 @@ void posterCircles() {
     speakerType(ariLocation, (shortSide(poster) / 8), "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
     speakerType(joshuaLocation, (shortSide(poster) / 8), "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
   } else {
-    speakerType(new PVector(poster.width/6, poster.height/2), "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
-    speakerType(joshuaLocation, "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
+    //speakerType(new PVector(poster.width/12, poster.height/2 - poster.height/typeScale * 1.5), 0, "Featuring Special Guests:");
+    speakerType(new PVector(poster.width/12, poster.height/2), 0, "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
+    speakerType(new PVector(poster.width/2, poster.height/2), 0, "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
   }
 }
 
@@ -245,7 +246,11 @@ void speakerType(PVector location, int offset, String type, String... descriptio
     typeSize = poster.height/typeScale;
   }
   typeSize = typeSize / 4 * 3;
-  setType(typeSize, typePathHeavy);
+  if (description.length == 0) {
+    setType(typeSize, typePathLight);
+  } else {
+    setType(typeSize, typePathHeavy);
+  }
   poster.textAlign(LEFT, TOP);
   poster.text(type, x, y);
   y += typeSize * 1.2;
