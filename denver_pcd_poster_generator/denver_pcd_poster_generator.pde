@@ -4,7 +4,7 @@
 // Mode
 int PIXELS = 0;
 int INCHES = 1;
-int runningMode = PIXELS;
+int runningMode = INCHES;
 
 // Variables for Size in Pixels
 int widthPixels = 1000;
@@ -142,11 +142,11 @@ void posterCircles() {
       poster.width/8
     );
     speakerType(ariLocation, (shortSide(poster) / 8), "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
-    speakerType(joshuaLocation, (shortSide(poster) / 8), "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
+    speakerType(joshuaLocation, (shortSide(poster) / 8), "Joshua Davis", "Creator of large scale generative artwork", "for events like Taylor Swift", "and DeadMau5 concerts");
   } else {
     //speakerType(new PVector(poster.width/12, poster.height/2 - poster.height/typeScale * 1.5), 0, "Featuring Special Guests:");
     speakerType(new PVector(poster.width/12, poster.height/2), 0, "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
-    speakerType(new PVector(poster.width/2, poster.height/2), 0, "Joshua Davis", "Generative Artwork for everything", "from Buildings to Concerts", "for Deadmau5 and Taylor Swift");
+    speakerType(new PVector(poster.width/2, poster.height/2), 0, "Joshua Davis", "Creator of large scale generative artwork", "for events like Taylor Swift", "and DeadMau5 concerts");
   }
 }
 
