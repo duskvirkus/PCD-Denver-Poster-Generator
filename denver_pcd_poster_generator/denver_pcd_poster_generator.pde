@@ -4,7 +4,7 @@
 // Mode
 int PIXELS = 0;
 int INCHES = 1;
-int runningMode = INCHES;
+int runningMode = PIXELS;
 
 // Variables for Size in Pixels
 int widthPixels = 1000;
@@ -24,9 +24,9 @@ ArrayList<Color> colors = new ArrayList<Color>();
 int saveCounter = 0;
 boolean posterGenerated = false;
 
-String typePathHeavy = "Mont-HeavyDEMO.otf";
-String typePathLight = "Mont-ExtraLightDEMO.otf";
-int typeScale = 18;
+String typePathHeavy = "OpenSans-ExtraBold.ttf";
+String typePathLight = "OpenSans-Regular.ttf";
+int typeScale = 20; // higher number is smaller text
 
 // Speakers
 PImage ari;
