@@ -142,11 +142,11 @@ void posterCircles() {
       poster.width/8
     );
     speakerType(ariLocation, (shortSide(poster) / 8), "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
-    speakerType(joshuaLocation, (shortSide(poster) / 8), "Joshua Davis", "Creator of large scale generative artwork", "for events like Taylor Swift", "and DeadMau5 concerts");
+    speakerType(joshuaLocation, (shortSide(poster) / 8), "Joshua Davis", "Creator of large scale generative artwork", "for events like Taylor Swift", "and Deadmau5 concerts");
   } else {
     //speakerType(new PVector(poster.width/12, poster.height/2 - poster.height/typeScale * 1.5), 0, "Featuring Special Guests:");
     speakerType(new PVector(poster.width/12, poster.height/2), 0, "Ari Melenciano", "Designer, DJ/VJ and", "Cofounder of Afrotechtopia");
-    speakerType(new PVector(poster.width/2, poster.height/2), 0, "Joshua Davis", "Creator of large scale generative artwork", "for events like Taylor Swift", "and DeadMau5 concerts");
+    speakerType(new PVector(poster.width/2, poster.height/2), 0, "Joshua Davis", "Creator of large scale generative artwork", "for events like Taylor Swift", "and Deadmau5 concerts");
   }
 }
 
