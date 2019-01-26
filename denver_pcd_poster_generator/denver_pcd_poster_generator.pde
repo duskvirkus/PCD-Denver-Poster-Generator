@@ -4,7 +4,7 @@
 // Mode
 int PIXELS = 0;
 int INCHES = 1;
-int runningMode = PIXELS;
+int runningMode = INCHES;
 
 // Variables for Size in Pixels
 int widthPixels = 1000;
@@ -215,7 +215,7 @@ void posterText() {
   setType(typeSize, typePathLight);
   poster.text("at The Commons on Champa", x, y);
   y += typeSize * 1.2;
-  poster.text("Febuary 9, 2019", x, y);
+  poster.text("February 9, 2019", x, y);
 
   // Bottom - reverse order
   typeSize = typeSize / 2;
